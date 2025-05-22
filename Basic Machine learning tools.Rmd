@@ -404,7 +404,7 @@ svm_predictions <- predict(svm_model, mtcarsTest)
 nn_model <- neuralnet(mpg ~ ., data = mtcarsTrain, hidden = 2) 
 
 # Make predictions
-nn_predictions <- compute(nn_model, mtcarsTest[,-1])
+nn_predictions <- predict(nn_model, mtcarsTest[,-1])
 
 # Evaluate models #calculating the MSE
 svm_MSE <- postResample(svm_predictions, mtcarsTest$mpg)
