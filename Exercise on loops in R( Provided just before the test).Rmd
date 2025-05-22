@@ -1,0 +1,108 @@
+---
+title: "Exerxises on loops in R (exxercises provided just before test 2)"
+author: '2025292778'
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+#Question 1 
+#Create the data frame ‘student.df’ with the data provided below:
+#name sex years
+#1 Sue f 21
+#2 Eva f 31
+#3 Henry m 29
+#4 Jan m 19
+#Use a simple ‘ifelse’ statement to add a new column ‘male.teen’ to the data frame. This is a boolean column, indicating T if the observation is a male younger than 20 years
+
+
+student.df <- data.frame(
+  name = c("Sue","Eva", "Henry", "Jan"),
+  sex = c("f","f","m","m"),
+  years = c(21,31,29,19),
+  stringsAsFactors = FALSE
+)
+
+#Question 2 
+
+#Write a double ‘for’ loop which prints 30 numbers given by c(1:10, 2:11, 3:12)
+
+#Double for loop to print the 20 numbers
+ 
+# Double for loop to print the 30 numbers
+for (i in 1:3) {         # outer loop: start values 1, 2, 3
+  for (j in 0:9) {       # inner loop: adds 0 to 9 to i
+    print(i + j)
+  }
+}
+
+#Question 3 
+#. Write a ‘for’ loop that prints the Displacement (‘disp’) of the ‘mtcars’ dataset. a. This loop will only print observations of 160 or higher in ‘disp’. b. This loop will stop as soon as an observation is smaller than 160 in ‘disp’.
+
+#Loop that prints only values in disp that are 160 or higher
+for ( i in mtcars$disp){
+  if(i >= 160){
+    print(i)
+  }
+}
+
+
+#Loop that stops when a disp value is found that is less than 160
+
+for (i in mtcars$disp){
+  if (i < 160){
+    break
+  }
+  print(i)
+}
+
+#Question 4 
+#Use the ‘rivers’ dataset to write a for loop. The loop prints the dataset: rivers shorter than 500 are a ‘short river’; rivers longer than 2000 are a ‘long river’; and rivers in the middle range are printed in their original numbers.
+
+
+
+#loop through each river lenght in the 'rivers' dataset
+
+for(length in rivers){
+  if(length < 500){
+    print("short river")
+  } else if (length > 200){
+    print("long river")
+  } else {
+    print(length)
+  }
+}
+
+
+#Question 5 
+#You have an urn with balls from 1 to 100. You want to find out how often you need to draw a ball to get number 55. This is an experiment with replacement – you put the ball back each time you draw. Simulate 1000 runs of the experiment to get an accurate estimation of the required draws.
+
+set.seed(123) # for reproducibility
+num_trials <- 1000 #number of experiment 
+results <- numeric(num_trials) #To store number of draws in each experiment
+
+for(i in 1:num_trials){
+  count <- 0 
+  repeat{
+    count <- count + 1 
+    draw <- sample (1:100, 1, replace = TRUE)
+    if (draw == 55) break
+  }
+  results[i] <- count 
+}
+
+
+#Summary statistics
+summary(results)
+
+#Optionally:Plot histogram of the number of draws
+hist(results, breaks = 50, col = "skyblue", main = "Draws until getting 55", xlab = "Number of Draws", ylab = "Frequency")
+
+
+
+
+
+
+
+```
+
