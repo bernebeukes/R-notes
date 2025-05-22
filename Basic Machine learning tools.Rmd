@@ -1,0 +1,484 @@
+---
+title: "Basic Machine learning tools in R"
+author: '2025292778'
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+#Machine learning is a vital technology in todays world due to several reasons 
+
+##Data Explosion: : In the current digital age, we’re generating vast amounts of data every
+##secondMachine learning algorithms can help to process, analyze, and make sense of this
+##data, extracting valuable insights that can inform decision-making.
+
+##Automations:Machine learning algorithms can learn from data and make decisions or
+##predictions without being explicitly programmed to do so. This capability is at the heart of
+##many modern automation and AI systems, helping to increase efficiency and productivity
+##in many industries.
+
+###Personalization: Machine learning algorithms are used to create personalized
+###experiences in many digital services. For example, recommendation systems in online
+###shopping or entertainment platforms use machine learning to suggest products or content
+###based on a user’s past behavior.
+
+###Improving Decision Making: Machine learning can help organizations make more
+###datadriven decisions. By providing quantitative, data-based assessments, machine
+###learning can help reduce bias and guesswork in decision-making processes. Anomaly
+###Detection: Machine learning is excellent at identifying unusual patterns or anomalies in
+###large datasets. This makes it invaluable in fields like cybersecurity, where it can help to
+###identify potential threats.
+
+
+###Advancements in AI: Machine learning, especially deep learning, has been crucial in the
+###recent advancements in Artificial Intelligence. Tasks like image and speech recognition,
+###natural language processing, and autonomous vehicles have all benefited greatly from
+###machine learning
+
+
+
+#####Regression analysis
+
+
+#This is a statistical technique used to model the relationship between a dependent variable and one or more independent variables.
+
+#####Simple linear regression
+
+#Models the relationship between a dependent variable and a single independent variable. it assumes a linear relationship between the variables. Here is a example
+
+data(iris)
+
+#Fitting a simple linear regression model 
+
+model <- lm(Sepal.Length ~ Sepal.Width, data = iris)
+
+#PRint the model summary 
+
+summary(model)
+
+
+#####Multiple Linear regression 
+
+#multiple linear regression models the relationship between a dependent variable and two or more variables. It allows for more complex relationship and provides insights into the combined effects of multiple predictors. Here is an example
+
+#Fitting the multiple linear regression model 
+data(mtcars)
+
+model <- lm(mpg~wt + disp + hp , data = mtcars)
+
+#Printing the model summary
+summary(model)
+
+####Logistic regression 
+
+#Logistic regression models the relationship between a binary( a variable that can only take on the value 0 or 1 ) dependent variable and one or more independent variables. It is used for classification tasks, where the dependent variables represents a categorical outcome. Here is a example
+
+#Fitting the logistic regression model 
+
+model<- glm(vs ~ mpg +wt + hp, data = mtcars, family = binomial)
+
+summary(model)
+
+#####REgression analysis with mtcars
+
+library(ggplot2)
+library(broom)
+head(mtcars)
+
+summary(mtcars)
+
+#Firstly we wil start with a simple linear regression using mpg as the respons and wt as the predictor 
+
+#Lets create a scatter plot for the mpg agains wt 
+ggplot(mtcars, aes(x=wt, y=mpg)) +
+geom_point()
+
+#Then we fit the simple regression model 
+
+simple_model <- lm(mpg ~ wt, data = mtcars)
+summary(simple_model)
+
+#Know we plot the regression line 
+
+ggplot(mtcars, aes( x= wt, y = mpg)) + 
+  geom_point() +
+  geom_smooth( method = lm , se = FALSE , color = "red", linetype = "dashed") + 
+  theme_minimal() +
+  labs(title = "Simple Linear Regression: MPG vs Weight", x = "weight" , y = "Miles per gallon", caption = "Red line represent the regression line")
+
+#Know we will try a multiple linear regression using mpg as the respons vriable and wt and hp as predictors
+
+multiple_model <- lm (mpg ~wt + hp, data = mtcars)
+summary(multiple_model)
+
+#Print the fitted model 
+
+fitted_values <- multiple_model$fitted.values
+print(fitted_values)
+
+#Print the ressiduals
+
+residual_values <- multiple_model$residuals
+print(residual_values)
+
+#Know we creat a data frame with the fitted values, residuals and actual 'mpg' values.
+
+#Creating a data frame containing observed mpg, fitted values, and residuals
+
+results <- data.frame(
+  Observed = mtcars$mpg,
+  Fitted = fitted_values,
+  Residuals = residual_values)
+
+#View the first few eows of the results 
+
+head(results)
+
+#Know we will check the residuals vs fitted values to see if the model meets the assumptions of linear regression
+
+##the augment() function is part of the broom package in R, which is used to turn statistical analysis objects from R into tidy data frames. The augment() function, in particular, adds columns to the original data such as fitted values, residuals, and other useful statistics.
+
+augment(multiple_model)
+
+#Plotting the augment 
+
+ggplot(augment(multiple_model), aes(.fitted, .resid)) + 
+  geom_point() + 
+  geom_hline( yintercept = 0, linetype = "dashed", color = "red") + 
+  theme_minimal() + 
+  labs( title  = "Residuals vs Fitted Values",
+x="Fitted Values",
+y="Residuals",
+caption="Red line represents y=0")
+
+###Support Vector Regression (SVR)
+
+#Support vector Regression is a powerful machine learning model for regression problems. We will demonstrate this to e1071 package and the built - in mtcars dataset
+
+library(e1071)
+library(ggplot2)
+
+svr_model <_ svm(mpg ~ wt , data = mtcars, kernel = "radial")
+summary(svr_model)
+
+#The output relates to the configuration of a Support Vector Machine (SVM) for an for an epsilonregression task. Here’s a breakdown of each parameter and what it signifies:
+
+##SVM-Type: eps-regression: This specifies the type of SVM being used, which is epsilon-regression (ε-regression). Epsilon-regression is used for regression tasks (predicting continuous values) rather than classification. The goal is to find a function that deviates from the actual observed outputs by a margin that is at most ε for each training example.
+
+##SVM-Kernel: radial:This indicates that the kernel used for the SVM is a radial basis function (RBF) kernel. The RBF kernel is a popular choice for SVMs because it can handle non-linear relationships between features. It transforms the input space into a higher-dimensional space where it is easier to find a linear separating hyperplane.
+
+##Cost, Gamma, Epsilon are the parameters needed for the model. These parameters collectively define how the SVM will behave, particularly in how it balances the accuracy against the model complexity and how sensitive it is to the training data. The output “Number of Support Vectors: 28” refers to the total count of support vectors used by the Support Vector Machine (SVM) model. Support vectors are the data points that lie closest to the decision surface (or hyperplane) and are crucial in defining the position and orientation of the hyperplane. These are the points that help the SVM model achieve the best separation between different classes or, in the case of regression, fit the optimal line or curve. A higher number of support vectors can indicate a model that is highly adapted to the training data, possibly leading to overfitting. Conversely, fewer support vectors might suggest a simpler model, which could potentially underfit the data if not enough complexity is captured.
+
+#Load necessary library
+library(e1071)
+library(ggplot2)
+
+#Load the mrcars dataset
+data("mtcars")
+
+#Fit the svr model predicting mpg based on wt and hp 
+svr_model <- svm(mpg ~ wt +hp, data = mtcars, type = "eps-regression", kernel = "radial")
+
+#Make predictions over a grid to plot 
+wt_seq <- seq(min(mtcars$wt), max(mtcars$wt), length.out = 100)
+hp_seq <- seq(min(mtcars$hp), max(mtcars$hp), length.out = 100)
+grid <- expand.grid(wt = wt_seq, hp = hp_seq)
+grid$mpg <- predict(svr_model, newdata = grid)
+
+#Basic plot of the fitted surface 
+
+ggplot(grid, aes(x = wt, y = hp, fill = mpg)) +
+ geom_tile() +
+ geom_contour(aes(z = mpg), color = "white") +
+ labs(title = "SVR Model Prediction of mpg",
+ x = "Weight (1000 lbs)",
+ y = "Horsepower",
+ fill = "Miles per Gallon") +
+ theme_minimal()+
+# Optionally add the actual data points
+geom_point(data = mtcars, aes(x = wt, y = hp, color = mpg), size = 3)
+
+#1. Axes: The x-axis represents the weight of the cars (wt) in thousands of pounds, and the y-axis represents the horsepower (hp). These are the two features used to predict the miles per gallon (mpg), which is depicted by both the color fill and the contour lines.
+
+#2. Color Fill: The varying shades of blue represent different predicted mpg values, with lighter shades indicating higher mpg and darker shades indicating lower mpg. The color legend on the right side of the plot maps the color gradient to the mpg values.
+
+#3. Contour Lines: The white lines are contour lines that represent levels of constant mpg. These lines help you to see the predicted mpg at different combinations of wt and hp. Where the lines are closer together, the mpg changes more rapidly with changes in wt and hp.
+
+#4. Data Points: The dark dots on the plot are the actual data points from the mtcars dataset. The position of each dot shows the actual wt and hp for each car, and the color of the dot reflects its actual mpg (according to the color scale on the right).
+
+#5. Model Interpretation: You can see from the contour lines and color fill that generally, as the weight of the car increases (moving right on the x-axis) and the horsepower increases (moving up on the y-axis), the mpg tends to decrease (the plot gets darker). This means that heavier cars with more horsepower tend to have lower fuel efficiency according to the SVR model’s predictions.
+
+#Fit Assessment: By looking at how closely the actual data points (dots) align with the contour lines, you can get an initial qualitative sense of how well the SVR model fits the data. If most points are near or on the contour lines that correspond to their color, it suggests a good fit.
+
+#A good fit would also be indicated by data points being distributed somewhat evenly across the contour lines, rather than clustering at particular contour lines or regions of the plot. The points are mostly in the lower half of the plot, suggesting that cars with higher weight and horsepower tend to have lower mpg, which fits with our expectations.
+
+# Identify the indices of the support vectors
+support_vector_indices <- svr_model$index
+# Extract the support vectors from the original data
+support_vectors <- mtcars[support_vector_indices, ]
+# Add the support vectors to the plot with a different shape or color to
+distinguish them
+ggplot(grid, aes(x=wt,y=hp,fill=mpg))+
+ geom_tile()+
+ geom_contour(aes(z=mpg),color = "white")+
+ geom_point(data = mtcars, aes(x=wt,y=hp),color= "white", size=5)+
+ geom_point(data = support_vectors,aes(x=wt,y=hp), color = "red", size = 5,
+shape=8)+
+ # Red squares for support vectors
+ labs(title = "SVR Model Prediction of mpg",
+ x = "Weight (1000 lbs)",
+ y = "Horsepower",
+ fill = "Miles per Gallon") +
+ theme_minimal()
+
+#Know we will evaluate the performance of the model using ####Mean squared error(MSE)
+predictions <- predict(svr_model, mtcars)
+mse <- mean((mtcars$mpg - predictions)^2)
+print(paste("MSE: ", mse))
+
+######MSE is a measure of how well the model fits the data. It is the average of the squared differences between the predicted and actual values. Lower values indicate a better fit to the data.
+
+#Another example with the 'economics' data 
+
+library(e1071)
+data = economics
+
+# Fit the SVR model predicting mpg based on wt and hp
+svr_model <- svm(psavert ~ uempmed + unemploy, data = data, type = "eps-regression",
+ kernel = "radial")
+
+# Make predictions over a grid to plot
+
+uemp_seq <- seq(min( data$uempmed), max(data$uempmed), length.out = 100)
+unemploy_seq <- seq(min(data$unemploy), max(data$unemploy), length.out = 100)
+grid <- expand.grid(uempmed = uemp_seq, unemploy = unemploy_seq)
+grid$ps_pred <- predict(svr_model, newdata = grid)
+
+# Basic plot of the fitted surface
+ggplot(grid, aes(x = uempmed, y = unemploy)) +
+ geom_tile(aes(fill = ps_pred)) +
+ geom_contour(aes(z = ps_pred), color = "white")+
+ geom_point(data = data, aes(x = uempmed, y = unemploy, color = psavert),
+size = 3)
+
+
+
+# Identify the indices of the support vectors
+support_vector_indices <- svr_model$index
+# Extract the support vectors from the original data
+support_vectors <- data[support_vector_indices, ]
+# Basic plot of the fitted surface
+ggplot(grid, aes(x = uempmed, y = unemploy)) +
+ geom_tile(aes(fill = ps_pred)) +
+ geom_contour(aes(z = ps_pred), color = "white")+
+ geom_point(data = data, aes(x = uempmed, y = unemploy, color = psavert),
+size = 3)+
+ geom_point(data = support_vectors,aes(x=uempmed,y=unemploy), color = "red",
+size = 5, shape=8)
+
+
+
+
+ggplot(grid, aes(x = uempmed, y = unemploy)) +
+ # Background tile from prediction surface
+ geom_tile(aes(fill = ps_pred)) +
+ # Contour lines
+ geom_contour(aes(z = ps_pred), color = "white") +
+ # Overlay original data points, manually colored by actual psavert
+ geom_point(data = data, aes(x = uempmed, y = unemploy, color = psavert),
+size = 3) +
+
+ # Manual color scale for points
+ scale_color_gradient(low = "yellow", high = "red", name =
+"Actual\npsavert") +
+
+ # Optional: color scale for tile fill (model predictions)
+ scale_fill_gradient(low = "lightblue", high = "blue", name =
+"Predicted\npsavert")
+
+
+ggplot(grid, aes(x = uempmed, y = unemploy)) +
+ # Background tile from prediction surface
+ geom_tile(aes(fill = ps_pred)) +
+ # Contour lines
+ geom_contour(aes(z = ps_pred), color = "white") +
+ # Overlay original data points, manually colored by actual psavert
+ geom_point(data = data, aes(x = uempmed, y = unemploy, color = psavert),
+size = 3) +
+
+ # Manual color scale for points
+ scale_color_gradient(low = "yellow", high = "red", name =
+"Actual\npsavert") +
+
+ # Optional: color scale for tile fill (model predictions)
+ scale_fill_gradient(low = "lightblue", high = "blue", name =
+"Predicted\npsavert")+
+ geom_point(data = support_vectors,aes(x=uempmed,y=unemploy), color =
+"red", size = 5, shape=8)
+
+
+####Artificial nueral network 
+
+#Artificial Neural Networks (ANN) are a class of machine learning models that are inspired by the structure of the human brain. In this document, we’ll demonstrate how to perform ANN in R using the neuralnet package and the built-in mtcars dataset.
+
+library(neuralnet)
+nn_model <- neuralnet(mpg ~ wt + hp, data = mtcars, hidden = 2)
+print(nn_model)
+
+#Plotting the Neural Network
+#Let’s plot the neural network structure.
+
+plot(nn_model)
+
+# Making Predictions
+#We can use the model to make predictions on the dataset.
+predictions <- compute(nn_model, mtcars[,c("wt", "hp")])
+head(predictions$net.result)
+
+###The neuralnet function in R returns a neural network model that has been trained using the data provided to it. The result is a list that includes many components. Here are some of the key components:
+
+#$call: This shows how the neuralnet function was called, including the formula that was used to specify the model, and the data that was used.
+
+#$response: This shows the response variable used in the training, in this case, mpg
+
+#$covariate: This is the matrix of covariates (predictor variables) used in the training. In this example, it includes wt and hp 
+
+#$model.list: This is a list that contains information about the model, including the response and covariate.
+
+
+#$err.fct: This is the error function that was used in the training. By default, it’s the sum of squared errors (sse).
+
+#$act.fct: This is the activation function used in the neurons of the neural network. By default, it’s the logistic function.
+
+#$linear.output: This is a logical indicator showing whether the output layer of the neuralnetwork uses a linear output function. By default, it’s TRUE.
+
+#$data: This is the data frame used to train the neural network. 
+
+
+#$weights: This is a list of matrices that represents the final weights of the neural networkfter training.
+
+#$startweights: This is a list of matrices that represents the initial random weights of the neural network before training.
+
+#$result.matrix: This is a matrix that contains information about the training process, including the error at each step.
+
+
+
+#The blue circles and lines in the neural network plot represent bias units and their connections. In neural networks, bias units serve as additional “always-on” neurons that allow the activation function to be shifted left or right, which can be critical for learning and modeling complex patterns.
+
+####The plot function visualizes the structure of the neural network, including the input layer (the predictor variables), the hidden layer(s), and the output layer (the response variable). The weights of the connections between the neurons are also shown. The compute function is used to make predictions using the trained neural network model. It takes the neural network model and a data frame of predictor variables, and it returns a list. The net.result element of this list is a matrix of the predicted values.
+
+###Which to choose? SVM or ANN?
+
+#It depends on the specific use cases, the nature of your data and what you are trying to achive
+
+###Support Vector Machines (SVM): SVMs are effective in high dimensional spaces, and when the number of dimensions is greater than the number of samples.
+
+
+###Artificial Neural Networks (ANN): ANNs are capable of modeling complex, non-linear relationships and can be highly effective on large datasets with many input variables. However, ANNs can be more computationally intensive than SVMs, and they can require more data preparation.
+
+#Example of using both 
+
+
+# Load necessary libraries
+library(ggplot2)
+library(lattice)
+library(e1071)
+library(neuralnet)
+library(caret)
+
+# Split the mtcars data into training and testing datasets
+set.seed(123)
+trainIndex <- createDataPartition(mtcars$mpg, p = .8,
+list = FALSE,
+times = 1)
+mtcarsTrain <- mtcars[ trainIndex,]
+mtcarsTest <- mtcars[-trainIndex,]
+
+# Train a SVM model
+svm_model <- svm(mpg ~ ., data = mtcarsTrain)
+
+# Make predictions
+svm_predictions <- predict(svm_model, mtcarsTest)
+
+# Train a neural network model using all variables in the dataset 
+nn_model <- neuralnet(mpg ~ ., data = mtcarsTrain, hidden = 2) 
+
+# Make predictions
+nn_predictions <- compute(nn_model, mtcarsTest[,-1])
+
+# Evaluate models #calculating the MSE
+svm_MSE <- postResample(svm_predictions, mtcarsTest$mpg)
+nn_MSE <- postResample(nn_predictions$net.result, mtcarsTest$mpg)
+print(svm_MSE)
+
+## RMSE Rsquared MAE
+## 3.699094 0.978711 2.582040
+print(nn_MSE)
+## RMSE Rsquared MAE
+## 7.82802 NA 6.20000
+
+#In this example, we train an SVM and an ANN model to predict miles per gallon (mpg) based on all other variables in the mtcars dataset. We then make predictions on a test set and compute the Mean Squared Error (MSE) for both models. The model with the lower MSE would generally be considered the better model for this specific dataset and problem.
+
+###MSE
+
+#Training error for classification
+
+#The training error is the proportion of misclassified observations in the training set.
+
+data(iris)
+# Fit SVM
+model <- svm(Species ~ ., data = iris, kernel = "radial")
+# Get predicted classes
+pred <- predict(model, iris)
+# Calculate training error
+training_error <- mean(pred != iris$Species)
+print(training_error)
+## [1] 0.02666667
+
+#This gives you the fraction of incorrect predictions, i.e., the training error rate
+
+##Training error for Regression
+
+#Note: This regression is not linear regression. Rather the regression is done by the support vector machine model, called the support vector regression (SVR).
+model_reg <- svm(mpg ~ ., data = mtcars, type = "eps-regression")
+pred_reg <- predict(model_reg, mtcars)
+# Example: Root Mean Squared Error (RMSE)
+rmse <- sqrt(mean((pred_reg - mtcars$mpg)^2))
+print(rmse)
+
+
+### in SVM modeling in R, the folloeing attributes are provided
+
+#In Support Vector Machine (SVM) modelling in R, the following attrributes are provided:
+#model$kernel # kernel used
+#model$cost # C parameter
+#model$gamma # gamma value
+#model$fitted # predicted values
+#model$SV # support vectors
+#model$index # indices of support vectors
+#model$tot.nSV # total number of support vectors
+
+
+
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

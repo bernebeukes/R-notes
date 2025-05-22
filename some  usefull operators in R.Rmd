@@ -1,0 +1,88 @@
+---
+title: "Useful operators in R (%in%) and (%>%)"
+author: '2025292778'
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+```{r}
+#Assignment operator: <- or = are used to assign values to variables
+
+#Comparison operators: == (equal to) != (not equal to)
+
+#Logical operators: & (and) | (Or) !(not) are used or combine logical expressions
+#Exp x > 3 & y < 5
+
+#Arithmic operators: + - * / 
+#Modelus operators: %% returns the remainder of division  
+
+###%in% checks if an element is present in a vector
+
+###%>% is used in tidyverse packages to chain functions togheter 
+
+#Colon operator ':' creates a sequence of numbers 
+
+
+
+####The %in% operator 
+
+# Define two vectors
+
+x <- c(1, 3, 5, 7)
+y <- c(2, 4, 6, 8)
+# Check which elements of x are in y
+x %in% y
+
+# Define a new vector
+z <- c(2, 4, 5, 8)
+
+# Check which elements of x are in z
+x %in% z
+
+# Check which elements of z are in y
+z %in% y
+
+###The pipe operator 
+
+library(dplyr)
+
+# Select the columns "mpg" and "cyl" from the mtcars dataset,
+# filter for cars with 6 cylinders or more,
+# sort the results by mpg in descending order,
+# and select the top 3 rows
+top_cars <- mtcars %>%
+ select(mpg, cyl) %>%
+ filter(cyl >= 6) %>%
+ arrange(desc(mpg)) %>%
+ head(3)
+# Print the top_cars dataframe
+top_car
+
+
+
+
+
+
+
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

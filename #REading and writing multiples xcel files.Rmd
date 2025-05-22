@@ -1,0 +1,110 @@
+---
+title: "Reading and writing multiple xcel files"
+author: '2025292778'
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+
+##Example 1 
+
+#We will be considering the txhousing data then we seperate the information for each city and save them in different xcell files 
+library(tidyverse)
+library(writexl)
+library(readxl)
+library(purrr)
+
+#Using txhousing from ggplot
+ggplot2 :: txhousing 
+
+#Create the directory where the files needs to be saves
+dir.create("txhousing")
+
+#Create one excel file 
+
+writexl :: write_xlsx(txhousing, path = "txhousing/txhousing.xlsx")
+
+####Function to create multiple excell files 
+
+write_ex_file = function(city_name){
+ txhousing %>% filter(city==city_name) %>%
+ writexl::write_xlsx(path =
+paste0("txhousing/txhousing_",city_name,".xlsx"))
+}
+
+#list of uniques city names 
+
+list_city = unique(txhousing$city)
+
+####Loop to create multiple excel files
+purrr::map(.x = list_city,write_ex_file)
+
+##Example 2 
+
+#The exponentially weighted moving average (EWMA) scheme is a process monitoirng
+#scheme. For every 𝑋𝑡 at time point 𝑡, we obtain 𝑍𝑡 = 𝜆𝑋𝑡 + (1 − 𝜆)𝑍(𝑡−1)
+#. We obtain
+#𝑍1, 𝑍2, . . . , 𝑍200 for 𝑋𝑡 ∼ 𝑁(0,1) and repeat the steps 2000 times. Then we have a
+#2000 × 200 matrix of EWMA values. Then this whole process is repeated for 20 times to
+#obtain 20 such matrices.
+#It can be done very easily if we write this iteration process as a function. The example is
+#given below.
+
+lambda = 0.2 # EWMA smoothing parameter
+n1 = 5 # subgroup size
+
+write_file = function(value){
+ EWMA.values = array(NA,dim = c(2000,200))
+ ## vary the lambda value for lambda = 0.1,0.15,0.2,0.25,...,0.9,0.95 and
+ ## store the matrix of EWMA values in separate excel sheets for each
+#lambda.
+ IC.sample = rnorm(ncol(EWMA.values))
+ mu = 0
+ for(i in 1:nrow(EWMA.values)){
+ for(j in 1:ncol(EWMA.values)){
+ if(j>1){
+ spl = sample(IC.sample,n1,replace = T)
+ EWMA.values[i,j] = lambda*mean(spl)+(1-lambda)*EWMA.values[i,(j-1)]
+ }else{
+ EWMA.values[i,j] = 0
+ }
+ }
+ }
+ EWMA.values = data.frame(EWMA.values)
+writexl::write_xlsx( EWMA.values,path =
+paste0("bootstrap_EWMA/EWMA_values_lambda=0.2_",value,".xlsx"))
+}
+
+write_file(0.2)
+list_values = c(1:20)
+purrr::map(.x = list_values, .f = write_file)
+
+
+
+
+
+
+
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
