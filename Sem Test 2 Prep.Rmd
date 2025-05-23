@@ -1,0 +1,157 @@
+---
+title: "Sem Test Prep"
+author: '2025902616'
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Writing own functions in R
+
+```{r}
+add_numbers <- function(x,y) {
+  result <- x + y
+  return(result)
+}
+
+sum <- add_numbers(278,4)
+print(sum)
+
+average <- function(numbers) {
+  total <- sum(numbers)
+  count <- length(numbers)
+  result <- total/count
+  return(result)
+}
+
+total_bill <- function(amount, tax_rate, tip_percent) {
+  tax <- amount * tax_rate
+  tip <- amount * (tip_percent/100)
+  total <- amount + tax + tip
+  return(total)
+}
+
+total_bill(105, 0.15, 10)
+
+```
+
+simple and multiple linear regressions for iris and mtcars datasets
+```{r}
+data(iris)
+
+model <- lm(Sepal.Length ~ Sepal.Width, data = iris)
+
+summary(model)
+
+data(mtcars)
+model_1 <- lm(mpg ~ wt + disp + hp, data = mtcars)
+summary(model_1)
+
+```
+
+logistic regression: between a binary dependent variable and one or more independent variables
+
+```{r}
+model_2 <- glm(vs ~ mpg + wt + hp, family = binomial, data = mtcars)
+summary(model_2)
+
+library(hrbrthemes)
+library(ggplot2)
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE, color = "red", linetype = "dashed") +
+  labs(title = "Simple Linear Regression: MPG vs Weight", 
+       x = "Weight",
+       y = "Miles per Gallon",
+       caption = "Red line represents the regression line")
+
+```
+
+multiple linear regression using miles per gallon as the variable and weight and horsepower as the predictors
+
+```{r}
+multiple_model <- lm(mpg~wt + hp, data = mtcars)
+summary(multiple_model)
+
+fitted_values <- multiple_model$fitted.values
+print(fitted_values)
+
+residual_values <- multiple_model$residuals
+residual_values
+
+results <- data.frame(
+  Observed = mtcars$mpg,
+  Fitted = fitted_values,
+  Residuals = residual_values
+)
+head(results)
+
+library(broom)
+augment(multiple_model)
+
+ggplot(augment(multiple_model), aes(.fitted, .resid)) +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Residuals vs Fitted values",
+       x = "Fitted Values",
+       y = "Residuals")
+
+```
+
+Fitted values are the values predicted by a linear model for the response variable based on the input data and estimated model parameters.
+Residuals are the difference between the observed values and the fitted values. They represent errors or unexplained variation. 
+
+The augment() function is used to turn statistical analysis objects from R into tify data frames.
+
+
+## Support Vector Regression
+```{r}
+library(e1071)
+library(ggplot2)
+
+svr_model <- svm(mpg ~ wt + hp, data = mtcars, type = "eps-regression", kernel = "radial")
+summary(svr_model)
+
+#now we make predictions over a grid to plot
+wt_seq <- seq(min(mtcars$wt), max(mtcars$wt), length.out = 100)
+hp_seq <- seq(min(mtcars$hp), max(mtcars$hp), length.out = 100)
+grid <- expand.grid(wt = wt_seq, hp = hp_seq)
+grid$mpg <- predict(svr_model, newdata = grid)
+
+ggplot(grid, aes(x = wt, y = hp, fill = mpg)) +
+  geom_tile() +
+  geom_contour(aes(z = mpg), color = "white") +
+  labs(title = "SVR Model Prediction of MPG", x = "Weight(1000lbs)", y = "Horsepower", fill = "Miles per Gallon") +
+  theme_minimal() +
+  geom_point(data = mtcars, aes(x = wt, y = hp, color = mpg), size = 3)
+
+predictions <- predict(svr_model, mtcars)
+mse <- mean((mtcars$mpg - predictions)^2)
+paste("MSE:", mse)
+
+
+```
+
+A higher number of support vectors can indicate that a model that is highly adapted to the training data, possibly leading to overfitting. But fewer support vectors might suggest a simpler model, leading to underfit data.
+
+The contour lines helps to see the predicted mpg at different combinations of wt and hp. Where the lines are closer together, the mpg changes more rapidly with changes in wt and hp. 
+The dots show the actual wt and hp of each car and the color reflects is actual mpg. 
+From the graph you can see as the weight and hp increases, the mpg decreases(plot gets darker)
+
+Lower values of the **mse** indicate a better fit to the data
+
+## Artificial Neural Network
+```{r}
+library(neuralnet)
+nn_model <- neuralnet(mpg ~ wt + hp, data = mtcars, hidden = 2)
+head(nn_model)
+plot(nn_model)
+
+predictions <- compute(nn_model, mtcars[,c("wt", "hp")])
+head(predictions$net.result)
+```
+
+The plot function visualizes the structure of the neural network, including the predictor variables, the hidden layers and the response variables. The compute function is used to make predictions using the trained neural network
